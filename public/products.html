@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Products - CRM Dashboard</title>
+ <link
+  href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:wght@300;400;600&display=swap"
+  rel="stylesheet">
+ <style>
+  :root {
+   --primary: #6366f1;
+   --success: #10b981;
+   --warning: #f59e0b;
+   --error: #ef4444;
+   --bg-dark: #0f172a;
+   --bg-darker: #020617;
+   --surface: #1e293b;
+   --surface-light: #334155;
+   --text: #f1f5f9;
+   --text-secondary: #94a3b8;
+   --border: #334155;
+  }
+
+  * {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+  }
+
+  body {
+   font-family: 'Archivo', sans-serif;
+   background: var(--bg-dark);
+   color: var(--text);
+  }
+
+  .dashboard {
+   display: flex;
+   height: 100vh;
+  }
+
+  .sidebar {
+   width: 260px;
+   background: var(--bg-darker);
+   border-right: 1px solid var(--border);
+   position: fixed;
+   height: 100vh;
+  }
+
+  .sidebar-header {
+   padding: 24px 20px;
+   border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+  }
+
+  .logo-icon {
+   width: 40px;
+   height: 40px;
+   background: linear-gradient(135deg, var(--primary), #ec4899);
+   border-radius: 10px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   font-family: 'Fraunces', serif;
+   font-size: 20px;
+   font-weight: 600;
+  }
+
+  .logo-text {
+   font-family: 'Fraunces', serif;
+   font-size: 20px;
+   font-weight: 600;
+  }
+
+  .sidebar-nav {
+   padding: 20px 0;
+  }
+
+  .nav-section {
+   margin-bottom: 24px;
+  }
+
+  .nav-label {
+   padding: 0 20px;
+   font-size: 11px;
+   text-transform: uppercase;
+   color: var(--text-secondary);
+   font-weight: 600;
+   margin-bottom: 8px;
+  }
+
+  .nav-item {
+   padding: 12px 20px;
+   display: flex;
+   align-items: center;
+   gap: 12px;
+   color: var(--text-secondary);
+   text-decoration: none;
+   transition: all 0.2s;
+   border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover {
+   background: var(--surface);
+   color: var(--text);
+  }
+
+  .nav-item.active {
+   background: var(--surface);
+   color: var(--primary);
+   border-left-color: var(--primary);
+  }
+
+  .nav-icon {
+   width: 20px;
+   height: 20px;
+  }
+
+  .main-content {
+   flex: 1;
+   margin-left: 260px;
+   display: flex;
+   flex-direction: column;
+   height: 100vh;
+  }
+
+  .topbar {
+   background: var(--bg-darker);
+   border-bottom: 1px solid var(--border);
+   padding: 16px 32px;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+  }
+
+  .topbar-left h1 {
+   font-family: 'Fraunces', serif;
+   font-size: 24px;
+   margin-bottom: 4px;
+  }
+
+  .breadcrumb {
+   font-size: 13px;
+   color: var(--text-secondary);
+  }
+
+  .topbar-right {
+   display: flex;
+   gap: 16px;
+   align-items: center;
+  }
+
+  .add-btn {
+   background: linear-gradient(135deg, var(--primary), #ec4899);
+   color: white;
+   border: none;
+   padding: 10px 20px;
+   border-radius: 10px;
+   font-weight: 600;
+   cursor: pointer;
+   display: flex;
+   align-items: center;
+   gap: 8px;
+  }
+
+  .logout-btn {
+   background: transparent;
+   border: 1px solid var(--border);
+   color: var(--text);
+   padding: 10px 20px;
+   border-radius: 10px;
+   font-weight: 600;
+   cursor: pointer;
+  }
+
+  .content {
+   flex: 1;
+   padding: 32px;
+   overflow-y: auto;
+  }
+
+  .filters {
+   display: flex;
+   gap: 12px;
+   margin-bottom: 24px;
+  }
+
+  .filter-btn {
+   padding: 10px 20px;
+   background: transparent;
+   border: 1px solid var(--border);
+   border-radius: 8px;
+   color: var(--text-secondary);
+   cursor: pointer;
+   transition: all 0.2s;
+  }
+
+  .filter-btn.active {
+   background: var(--primary);
+   border-color: var(--primary);
+   color: white;
+  }
+
+  .products-grid {
+   display: grid;
+   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+   gap: 24px;
+  }
+
+  .product-card {
+   background: var(--surface);
+   border: 1px solid var(--border);
+   border-radius: 16px;
+   padding: 24px;
+   transition: all 0.3s;
+  }
+
+  .product-card:hover {
+   transform: translateY(-4px);
+   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .product-header {
+   display: flex;
+   justify-content: space-between;
+   align-items: start;
+   margin-bottom: 16px;
+  }
+
+  .product-header h3 {
+   font-size: 18px;
+   margin-bottom: 4px;
+  }
+
+  .category-badge {
+   padding: 4px 12px;
+   background: rgba(99, 102, 241, 0.1);
+   color: var(--primary);
+   border-radius: 6px;
+   font-size: 12px;
+   font-weight: 600;
+  }
+
+  .product-price {
+   font-size: 24px;
+   font-weight: 700;
+   color: var(--success);
+   margin-bottom: 16px;
+  }
+
+  .stock-info {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   margin-bottom: 16px;
+   padding: 12px;
+   background: rgba(255, 255, 255, 0.03);
+   border-radius: 8px;
+  }
+
+  .stock-label {
+   font-size: 13px;
+   color: var(--text-secondary);
+  }
+
+  .stock-value {
+   font-weight: 600;
+  }
+
+  .stock-value.low {
+   color: var(--error);
+  }
+
+  .stock-value.medium {
+   color: var(--warning);
+  }
+
+  .stock-value.high {
+   color: var(--success);
+  }
+
+  .product-actions {
+   display: flex;
+   gap: 8px;
+  }
+
+  .action-btn {
+   flex: 1;
+   padding: 8px;
+   border: 1px solid var(--border);
+   background: transparent;
+   color: var(--text);
+   border-radius: 8px;
+   cursor: pointer;
+   font-size: 14px;
+   transition: all 0.2s;
+  }
+
+  .action-btn:hover {
+   background: var(--surface-light);
+   border-color: var(--primary);
+  }
+
+  .action-btn.delete:hover {
+   border-color: var(--error);
+   color: var(--error);
+  }
+
+  .modal {
+   display: none;
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: rgba(0, 0, 0, 0.7);
+   z-index: 1000;
+   align-items: center;
+   justify-content: center;
+  }
+
+  .modal.show {
+   display: flex;
+  }
+
+  .modal-content {
+   background: var(--surface);
+   border-radius: 16px;
+   padding: 32px;
+   max-width: 500px;
+   width: 90%;
+   border: 1px solid var(--border);
+  }
+
+  .modal-header h2 {
+   font-size: 24px;
+   font-family: 'Fraunces', serif;
+   margin-bottom: 24px;
+  }
+
+  .form-group {
+   margin-bottom: 20px;
+  }
+
+  .form-group label {
+   display: block;
+   margin-bottom: 8px;
+   font-size: 14px;
+   font-weight: 500;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+   width: 100%;
+   padding: 12px;
+   background: rgba(255, 255, 255, 0.03);
+   border: 1px solid var(--border);
+   border-radius: 8px;
+   color: var(--text);
+   font-size: 14px;
+   font-family: 'Archivo', sans-serif;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+   outline: none;
+   border-color: var(--primary);
+  }
+
+  .form-group textarea {
+   resize: vertical;
+   min-height: 80px;
+  }
+
+  .modal-actions {
+   display: flex;
+   gap: 12px;
+   margin-top: 24px;
+  }
+
+  .btn {
+   flex: 1;
+   padding: 12px;
+   border-radius: 8px;
+   font-weight: 600;
+   cursor: pointer;
+  }
+
+  .btn-primary {
+   background: linear-gradient(135deg, var(--primary), #ec4899);
+   color: white;
+   border: none;
+  }
+
+  .btn-secondary {
+   background: transparent;
+   border: 1px solid var(--border);
+   color: var(--text);
+  }
+
+  .loading {
+   text-align: center;
+   padding: 40px;
+   color: var(--text-secondary);
+  }
+ </style>
+</head>
+
+<body>
+ <div class="dashboard">
+  <aside class="sidebar">
+   <div class="sidebar-header">
+    <div class="logo">
+     <div class="logo-icon">A</div>
+     <div class="logo-text">AdminCRM</div>
+    </div>
+   </div>
+   <nav class="sidebar-nav">
+    <div class="nav-section">
+     <div class="nav-label">Main</div>
+     <a href="dashboard.html" class="nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+      <span>Dashboard</span>
+     </a>
+     <a href="customers.html" class="nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+      <span>Customers</span>
+     </a>
+     <a href="orders.html" class="nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+      </svg>
+      <span>Orders</span>
+     </a>
+     <a href="products.html" class="nav-item active">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+      <span>Products</span>
+     </a>
+    </div>
+
+    <div class="nav-section">
+     <div class="nav-label">Analytics</div>
+     <a href="#" class="nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+      <span>Reports</span>
+     </a>
+     <a href="#" class="nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+      </svg>
+      <span>Analytics</span>
+     </a>
+    </div>
+
+    <div class="nav-section">
+     <div class="nav-label">Settings</div>
+     <a href="#" class="nav-item">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      <span>Settings</span>
+     </a>
+    </div>
+   </nav>
+  </aside>
+
+  <main class="main-content">
+   <div class="topbar">
+    <div class="topbar-left">
+     <h1>Products</h1>
+     <div class="breadcrumb">Home / Products</div>
+    </div>
+    <div class="topbar-right">
+     <button class="add-btn" onclick="openAddModal()">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Add Product
+     </button>
+     <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+   </div>
+
+   <div class="content">
+    <div class="filters">
+     <button class="filter-btn active" data-category="all">All Products</button>
+     <button class="filter-btn" data-category="Electronics">Electronics</button>
+     <button class="filter-btn" data-category="Clothing">Clothing</button>
+     <button class="filter-btn" data-category="Food">Food</button>
+     <button class="filter-btn" data-category="Books">Books</button>
+     <button class="filter-btn" data-category="Other">Other</button>
+    </div>
+
+    <div class="products-grid" id="productsGrid">
+     <div class="loading">Loading products...</div>
+    </div>
+   </div>
+  </main>
+ </div>
+
+ <!-- Add/Edit Product Modal -->
+ <div class="modal" id="productModal">
+  <div class="modal-content">
+   <div class="modal-header">
+    <h2 id="modalTitle">Add New Product</h2>
+   </div>
+   <form id="productForm">
+    <input type="hidden" id="productId">
+    <div class="form-group">
+     <label>Product Name</label>
+     <input type="text" id="productName" required>
+    </div>
+    <div class="form-group">
+     <label>Category</label>
+     <select id="category" required>
+      <option value="">Select Category</option>
+      <option value="Electronics">Electronics</option>
+      <option value="Clothing">Clothing</option>
+      <option value="Food">Food</option>
+      <option value="Books">Books</option>
+      <option value="Other">Other</option>
+     </select>
+    </div>
+    <div class="form-group">
+     <label>Price ($)</label>
+     <input type="number" id="price" step="0.01" min="0" required>
+    </div>
+    <div class="form-group">
+     <label>Stock Quantity</label>
+     <input type="number" id="stockQuantity" min="0" required>
+    </div>
+    <div class="form-group">
+     <label>Description</label>
+     <textarea id="description"></textarea>
+    </div>
+    <div class="modal-actions">
+     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+     <button type="submit" class="btn btn-primary">Save Product</button>
+    </div>
+   </form>
+  </div>
+ </div>
+
+ <script>
+  if (!sessionStorage.getItem('isAuthenticated')) {
+   window.location.href = 'login-page.html';
+  }
+
+  const API_BASE = 'http://localhost:3000/api';
+  let allProducts = [];
+
+  function logout() {
+   sessionStorage.clear();
+   window.location.href = 'login-page.html';
+  }
+
+  async function fetchProducts(category = 'all') {
+   try {
+    const url = category === 'all' ? `${API_BASE}/products` : `${API_BASE}/products?category=${category}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.success) {
+     allProducts = data.products;
+     renderProducts(allProducts);
+    }
+   } catch (error) {
+    console.error('Error fetching products:', error);
+    document.getElementById('productsGrid').innerHTML =
+     '<div class="loading" style="color: var(--error);">Failed to load products</div>';
+   }
+  }
+
+  function getStockClass(stock) {
+   if (stock === 0) return 'low';
+   if (stock < 50) return 'medium';
+   return 'high';
+  }
+
+  function renderProducts(products) {
+   const grid = document.getElementById('productsGrid');
+
+   if (products.length === 0) {
+    grid.innerHTML = '<div class="loading">No products found</div>';
+    return;
+   }
+
+   grid.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="product-header">
+                        <div>
+                            <h3>${product.product_name}</h3>
+                            <span class="category-badge">${product.category}</span>
+                        </div>
+                    </div>
+                    <div class="product-price">$${parseFloat(product.price).toFixed(2)}</div>
+                    <div class="stock-info">
+                        <span class="stock-label">Stock:</span>
+                        <span class="stock-value ${getStockClass(product.stock_quantity)}">${product.stock_quantity} units</span>
+                    </div>
+                    ${product.description ? `<p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">${product.description}</p>` : ''}
+                    <div class="product-actions">
+                        <button class="action-btn" onclick="editProduct(${product.product_id})">Edit</button>
+                        <button class="action-btn delete" onclick="deleteProduct(${product.product_id}, '${product.product_name}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+   btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    fetchProducts(btn.dataset.category);
+   });
+  });
+
+  function openAddModal() {
+   document.getElementById('modalTitle').textContent = 'Add New Product';
+   document.getElementById('productForm').reset();
+   document.getElementById('productId').value = '';
+   document.getElementById('productModal').classList.add('show');
+  }
+
+  function closeModal() {
+   document.getElementById('productModal').classList.remove('show');
+  }
+
+  function editProduct(id) {
+   const product = allProducts.find(p => p.product_id === id);
+   if (!product) return;
+
+   document.getElementById('modalTitle').textContent = 'Edit Product';
+   document.getElementById('productId').value = product.product_id;
+   document.getElementById('productName').value = product.product_name;
+   document.getElementById('category').value = product.category;
+   document.getElementById('price').value = product.price;
+   document.getElementById('stockQuantity').value = product.stock_quantity;
+   document.getElementById('description').value = product.description || '';
+   document.getElementById('productModal').classList.add('show');
+  }
+
+  async function deleteProduct(id, name) {
+   if (!confirm(`Are you sure you want to delete ${name}?`)) return;
+
+   try {
+    const response = await fetch(`${API_BASE}/products/${id}`, {
+     method: 'DELETE'
+    });
+    const data = await response.json();
+
+    if (data.success) {
+     alert('Product deleted successfully!');
+     fetchProducts();
+    } else {
+     alert('Failed to delete product');
+    }
+   } catch (error) {
+    console.error('Error deleting product:', error);
+    alert('Error deleting product');
+   }
+  }
+
+  document.getElementById('productForm').addEventListener('submit', async (e) => {
+   e.preventDefault();
+
+   const productId = document.getElementById('productId').value;
+   const productData = {
+    product_name: document.getElementById('productName').value,
+    category: document.getElementById('category').value,
+    price: parseFloat(document.getElementById('price').value),
+    stock_quantity: parseInt(document.getElementById('stockQuantity').value),
+    description: document.getElementById('description').value
+   };
+
+   try {
+    const url = productId ? `${API_BASE}/products/${productId}` : `${API_BASE}/products`;
+    const method = productId ? 'PUT' : 'POST';
+
+    const response = await fetch(url, {
+     method: method,
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify(productData)
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+     alert(productId ? 'Product updated successfully!' : 'Product added successfully!');
+     closeModal();
+     fetchProducts();
+    } else {
+     alert('Failed to save product');
+    }
+   } catch (error) {
+    console.error('Error saving product:', error);
+    alert('Error saving product');
+   }
+  });
+
+  window.addEventListener('DOMContentLoaded', () => fetchProducts());
+ </script>
+</body>
+
+</html>
